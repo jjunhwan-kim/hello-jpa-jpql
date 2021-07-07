@@ -51,10 +51,10 @@ public class FetchJoinTest {
             em.flush();
             em.clear();
 
-            //String query = "select m from Member m";
-/*
             // 페치 조인
-            String query = "select m from Member m join fetch m.team";
+            /*
+            //String query = "select m from Member m join fetch m.team";
+            //String query = "select m from Member m";
 
             List<Member> result = em.createQuery(query, Member.class).getResultList();
 
@@ -66,14 +66,26 @@ public class FetchJoinTest {
                 // 회원4, 팀C(DB)
                 // 회원이 100명이고 전부 다른 팀 소속이라면 -> N + 1 만큼 쿼리가 나감
             }
-*/
+            */
 
-            // 컬렉션 페치 조인 - 연관된 엔티티를 함께 조회함, Team, Member조화
-            String query = "select distinct t from Team t join fetch t.members";
+            // 컬렉션 페치 조인 - 연관된 엔티티를 함께 조회함, Team, Member조회
+            //String query = "select distinct t from Team t join fetch t.members";
             // 일반 조인 - 연관된 엔티티를 함께 조회하지 않음, Team만 조회
             //String query = "select t from Team t join t.members m";
 
-            List<Team> result = em.createQuery(query, Team.class).getResultList();
+            /*
+            컬렉션 페치 조인시 페이징 API를 사용할 수 없음
+              - 페치 조인시 페이징 API 사용시 메모리에서 페이징함, DB에 페이징 쿼리가 안나가고 모든 행을 다 불러옴
+              - 방향을 반대로 바꿔서 다대일로 풀어내는 방법, Member에서 Team을 Join해서 페이징
+                - "select m from Member m join fetch m.team"
+              - Team만 조회하고, @BatchSize 또는 hibernate.default_batch_fetch_size 사용
+                - "select t from Team t"
+            */
+            String query = "select t from Team t";
+            List<Team> result = em.createQuery(query, Team.class)
+                    .setFirstResult(0)
+                    .setMaxResults(2)
+                    .getResultList();
 
             System.out.println("result = " + result.size());
 
