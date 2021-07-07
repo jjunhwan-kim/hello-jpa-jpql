@@ -46,6 +46,10 @@ public class Member {
         team.getMembers().add(this);
     }
 
+    public Team getTeam() {
+        return team;
+    }
+
     public MemberType getType() {
         return type;
     }
